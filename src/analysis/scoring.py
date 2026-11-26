@@ -1,4 +1,4 @@
-from bisect import bisect_right
+from bisect import bisect_left, bisect_right
 from collections.abc import Iterable, Iterator
 from fractions import Fraction
 from math import isfinite
@@ -16,6 +16,7 @@ class Bands(TypedDict):
 
     thresholds: list[float]
     scores: list[float]
+    inclusive_upper: list[float]
 
 
 class ScoreConfig(TypedDict):
@@ -74,7 +75,15 @@ def load_scoring(spec: object, categories: list[str]) -> ScoreConfig:
             raise ValueError(f"{layer} thresholds must be at most 1")
         if layer == "dpph" and scores != sorted(scores, reverse=True):
             raise ValueError("DPPH scores must not increase with IC50")
-        bands[layer] = {"thresholds": thresholds, "scores": scores}
+        raw_inclusive = table.get("inclusive_upper", [])
+        if not isinstance(raw_inclusive, list):
+            raise ValueError(f"{layer} inclusive_upper must be a list of thresholds")
+        inclusive_upper = [_number(value, f"{layer} inclusive_upper") for value in raw_inclusive]
+        if len(inclusive_upper) != len(set(inclusive_upper)) or not set(inclusive_upper).issubset(thresholds):
+            raise ValueError(f"{layer} inclusive_upper must contain distinct configured thresholds")
+        bands[layer] = {
+            "thresholds": thresholds, "scores": scores, "inclusive_upper": inclusive_upper,
+        }
 
     custom = spec.get("profiles", {})
     if not isinstance(custom, dict) or "uniform" in custom:
@@ -101,7 +110,9 @@ def _components(sample: Sample, config: ScoreConfig) -> dict[str, float]:
     components = {"ccd": config["ccd"][sample["ccd"]]}
     for layer in NUMERIC_LAYERS:
         band = config["bands"][layer]
-        components[layer] = band["scores"][bisect_right(band["thresholds"], sample[layer])]
+        value = sample[layer]
+        locate = bisect_left if value in band.get("inclusive_upper", []) else bisect_right
+        components[layer] = band["scores"][locate(band["thresholds"], value)]
     return components
 
 
