@@ -1,25 +1,25 @@
 {
-  "descricao": "CCD, UV, DNA e coeficientes da simulação são provisórios e ilustrativos.",
-  "ccd": ["TRACOS", "MODERADO", "RICO"],
-  "cortes": {
-    "fenois": [50, 150],
-    "dpph": [50, 100, 250, 500],
-    "fps": [6, 15, 30, 60],
-    "uv": [0.4, 0.7]
-  },
-  "corte_dna": 0.6,
-  "simulacao": {
-    "ccd": [0.0, 1.0, 0.35],
-    "ccd_cortes": [-0.5, 0.5],
-    "fenois": [100, 65, 23],
-    "log_dpph": [5.0, -0.8, 0.45],
-    "log_fps": [2.4, 0.95, 0.55],
-    "uv": [0.62, 0.19, 0.17],
-    "dna": [0.27, 0.13, 0.16],
-    "peso_uv_no_dna": 0.55,
-    "prob_falha_uv": 0.16,
-    "perda_uv": 0.35,
-    "prob_falha_dna": 0.12,
-    "perda_dna": 0.38
-  }
+    "description": "CCD, UV, DNA and simulation coefficients are provisional and illustrative.",
+    "ccd": ["TRACE", "MODERATE", "RICH"],
+    "thresholds": {
+        "phenols": [50, 150],
+        "dpph": [50, 100, 250, 500],
+        "fps": [6, 15, 30, 60],
+        "uv": [0.4, 0.7]
+    },
+    "dna_threshold": 0.6,
+    "simulation": {
+        "ccd": [0.0, 1.0, 0.35],
+        "ccd_thresholds": [-0.5, 0.5],
+        "phenols": [100, 65, 23],
+        "log_dpph": [5.0, -0.8, 0.45],
+        "log_fps": [2.4, 0.95, 0.55],
+        "uv": [0.62, 0.19, 0.17],
+        "dna": [0.27, 0.13, 0.16],
+        "uv_weight_in_dna": 0.55,
+        "uv_failure_probability": 0.16,
+        "uv_loss": 0.35,
+        "dna_failure_probability": 0.12,
+        "dna_loss": 0.38
+    }
 }
