@@ -4,7 +4,7 @@
 
 - Python 3.10 ou superior.
 
-O projeto utiliza exclusivamente a biblioteca padrão do Python, não sendo necessária a instalação de dependências externas.
+O núcleo usa a biblioteca padrão do Python. A renderização dos relatórios usa Matplotlib e Graphviz.
 
 ## 1. Configuração
 
@@ -100,7 +100,89 @@ python main.py infer data/train.csv --levels 5 --output data/moore_5.json
 python main.py evaluate data/moore_5.json data/test.csv --output data/decisions_5.csv
 ```
 
-## 6. Ajuda
+## 6. Experimento comparativo
+
+Salve uma especificação JSON. O exemplo abaixo é para um piloto e pressupõe
+que o arquivo JSON está no mesmo diretório de `parameters.json`.
+
+```json
+{
+  "config": "parameters.json",
+  "seeds": [42, 43],
+  "train_sizes": [100, 200],
+  "test_size": 50,
+  "levels": [3, 5],
+  "min_support": 3
+}
+```
+
+```bash
+python main.py experiment --spec pilot.json --output-dir results/pilot
+```
+
+O diretório de saída precisa ser novo. Em cada semente, todas as políticas usam
+o mesmo teste, e os treinos menores usam subconjuntos iniciais do treino maior.
+Os baselines sem poda e com corte estrito `FPS > 6` são avaliados uma vez por semente.
+
+| Arquivo | Conteúdo |
+|---|---|
+| `decisions.csv` | Decisão por execução, política e amostra. |
+| `metrics_by_seed.csv` | Contagens, taxas de descarte, economia de ensaios e compactação da Moore. |
+| `metrics_summary.csv` | Média, desvio-padrão amostral e número de repetições válidas por métrica. Quando `baseline` está preenchido, a linha resume a diferença entre a taxa da Moore e a do baseline na mesma semente. |
+| `manifest.json` | Configuração efetiva, sementes, tamanhos e versão do Python. Gravado ao concluir a execução. |
+
+As taxas usam a escala de 0 a 1, e os deltas usam a mesma unidade. Células vazias
+indicam valores indefinidos ou campos que não se aplicam à política. A economia
+expressa execuções de ensaios que seriam evitadas pelo primeiro descarte.
+
+## 7. Escore, ranking e relatórios
+
+Para incluir o ranking, acrescente uma seção `score` à especificação do
+experimento. O exemplo abaixo contém pontuações e pesos ilustrativos para o piloto.
+
+```json
+{
+  "ccd": {"TRACE": 0, "MODERATE": 0.5, "RICH": 1},
+  "bands": {
+    "phenols": {"thresholds": [50, 150], "scores": [0, 0.5, 1]},
+    "dpph": {"thresholds": [100, 250], "scores": [1, 0.5, 0]},
+    "fps": {"thresholds": [6, 15], "scores": [0, 0.5, 1]},
+    "uv": {"thresholds": [0.4, 0.7], "scores": [0, 0.5, 1]},
+    "dna": {"thresholds": [0.6, 0.8], "scores": [0, 0.5, 1]}
+  },
+  "profiles": {"fps_and_dna": {"fps": 2, "dna": 2}}
+}
+```
+
+O objeto acima é o valor de `score`. Cada corte pertence à faixa superior e
+`scores` tem um elemento a mais que `thresholds`. As pontuações ficam entre 0 e 1.
+As de DPPH decrescem ou se mantêm com o IC₅₀. Cada peso deve ser positivo e tem
+valor padrão 1. O perfil `uniform` está sempre presente. `rankings.csv` lista as
+seis pontuações, o escore e a posição em cada perfil para as amostras viáveis
+encaminhadas pela Moore. Empates compartilham a mesma posição.
+
+Para exportar o JSON da máquina ilustrada, acrescente à especificação um campo
+`diagram_run` com uma combinação da bateria, por exemplo
+`{"seed": 42, "levels": 3, "train_size": 200}`.
+
+```bash
+python main.py report --experiment-dir results/pilot --output-dir results/pilot-report
+```
+
+O relatório usa um diretório novo. Ele gera `comparison.csv` e `topology.csv`
+e inclui `rankings.csv` e `rank_changes.csv` quando o escore está configurado.
+As mudanças de posição usam o perfil `uniform` da mesma execução como referência.
+Valores positivos em `positions_gained` indicam avanço no ranking.
+
+Instale Matplotlib com `python -m pip install matplotlib` para renderizar as
+curvas de sensibilidade e distribuições do escore em SVG. As barras das curvas
+mostram o desvio-padrão amostral entre sementes. O relatório gera `moore.dot`
+quando `diagram_run` está configurado. Com Graphviz instalado e `dot` no `PATH`,
+também gera `moore.svg`. As arestas tracejadas apontam para o estado de continuidade.
+Quando falta um renderizador, o comando informa a dependência e entrega as
+tabelas e o DOT disponível.
+
+## 8. Ajuda
 
 Para consultar todos os comandos e argumentos disponíveis:
 
@@ -109,6 +191,8 @@ python main.py --help
 python main.py generate --help
 python main.py infer --help
 python main.py evaluate --help
+python main.py experiment --help
+python main.py report --help
 ```
 
 ## Observações
