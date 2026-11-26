@@ -1,6 +1,6 @@
 # Triagem Sequencial de Extratos Vegetais
 
-As verificações e os procedimentos de reprodução estão no [relatório de validação computacional](docs/validation.md).
+As evidências computacionais e os resultados preliminares da pesquisa estão no [registro técnico-científico](docs/report.md).
 
 ## Requisitos
 
