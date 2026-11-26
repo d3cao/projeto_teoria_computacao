@@ -1,5 +1,7 @@
 # Triagem Sequencial de Extratos Vegetais
 
+As verificações e os procedimentos de reprodução estão no [relatório de validação computacional](docs/validation.md).
+
 ## Requisitos
 
 - Python 3.10 ou superior.
