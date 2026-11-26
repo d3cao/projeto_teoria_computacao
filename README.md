@@ -102,26 +102,17 @@ python main.py evaluate data/moore_5.json data/test.csv --output data/decisions_
 
 ## 6. Experimento comparativo
 
-Salve uma especificação JSON. O exemplo abaixo é para um piloto e pressupõe
-que o arquivo JSON está no mesmo diretório de `parameters.json`.
-
-```json
-{
-  "config": "parameters.json",
-  "seeds": [42, 43],
-  "train_sizes": [100, 200],
-  "test_size": 50,
-  "levels": [3, 5],
-  "min_support": 3
-}
-```
+Use [a especificação do piloto](experiments/pilot.json) para conferir o fluxo de
+execução. Os parâmetros e pesos desse piloto são ilustrativos. O caminho em
+`config` é relativo ao diretório da especificação.
 
 ```bash
-python main.py experiment --spec pilot.json --output-dir results/pilot
+python main.py experiment --spec experiments/pilot.json --output-dir results/pilot
 ```
 
 O diretório de saída precisa ser novo. Em cada semente, todas as políticas usam
-o mesmo teste, e os treinos menores usam subconjuntos iniciais do treino maior.
+o mesmo teste. Informe sementes inteiras não negativas e sem repetição.
+Em cada semente, os treinos menores usam subconjuntos iniciais do treino maior.
 Os baselines sem poda e com corte estrito `FPS > 6` são avaliados uma vez por semente.
 
 | Arquivo | Conteúdo |
@@ -134,27 +125,16 @@ Os baselines sem poda e com corte estrito `FPS > 6` são avaliados uma vez por s
 As taxas usam a escala de 0 a 1, e os deltas usam a mesma unidade. Células vazias
 indicam valores indefinidos ou campos que não se aplicam à política. A economia
 expressa execuções de ensaios que seriam evitadas pelo primeiro descarte.
+`assay_days_saved_min` e `assay_days_saved_max` estimam a soma do trabalho
+poupado, considerando 1 a 2 dias por execução evitada de UV ou DNA. A estimativa
+é ilustrativa, e o prazo de calendário depende do paralelismo no laboratório.
 
 ## 7. Escore, ranking e relatórios
 
-Para incluir o ranking, acrescente uma seção `score` à especificação do
-experimento. O exemplo abaixo contém pontuações e pesos ilustrativos para o piloto.
-
-```json
-{
-  "ccd": {"TRACE": 0, "MODERATE": 0.5, "RICH": 1},
-  "bands": {
-    "phenols": {"thresholds": [50, 150], "scores": [0, 0.5, 1]},
-    "dpph": {"thresholds": [100, 250], "scores": [1, 0.5, 0]},
-    "fps": {"thresholds": [6, 15], "scores": [0, 0.5, 1]},
-    "uv": {"thresholds": [0.4, 0.7], "scores": [0, 0.5, 1]},
-    "dna": {"thresholds": [0.6, 0.8], "scores": [0, 0.5, 1]}
-  },
-  "profiles": {"fps_and_dna": {"fps": 2, "dna": 2}}
-}
-```
-
-O objeto acima é o valor de `score`. Cada corte pertence à faixa superior e
+Para incluir o ranking, acrescente uma seção `score` à especificação, como no
+[piloto](experiments/pilot.json). Por padrão, cada corte pertence à faixa
+superior. Liste em `inclusive_upper` os cortes que devem pertencer à faixa
+inferior. No exemplo, fenóis iguais a 150 ficam na faixa intermediária.
 `scores` tem um elemento a mais que `thresholds`. As pontuações ficam entre 0 e 1.
 As de DPPH decrescem ou se mantêm com o IC₅₀. Cada peso deve ser positivo e tem
 valor padrão 1. O perfil `uniform` está sempre presente. `rankings.csv` lista as
@@ -182,7 +162,24 @@ também gera `moore.svg`. As arestas tracejadas apontam para o estado de continu
 Quando falta um renderizador, o comando informa a dependência e entrega as
 tabelas e o DOT disponível.
 
-## 8. Ajuda
+## 8. Fechamento do protocolo experimental
+
+Antes da bateria do artigo, registre junto da especificação final:
+
+- A origem e o status das categorias de CCD, dos cortes de UV e DNA, das
+  correlações simuladas e das frequências de falha tardia, com a fundamentação
+  fornecida por João Pedro.
+- O gabarito adotado e a definição de descarte correto. A implementação atual
+  usa a viabilidade por DNA. Confirme com o laboratório o papel eliminatório de UV.
+- As seis tabelas de pontuação, seus cortes inclusivos e a justificativa dos
+  perfis de pesos alternativos ao perfil uniforme.
+- As sementes reservadas, os tamanhos de treino e teste, os níveis, o suporte
+  mínimo e a configuração da máquina escolhida para a figura.
+- Os critérios de interpretação dos falsos descartes por ponto, do equilíbrio
+  entre eficiência e economia e das mudanças de posição entre perfis. Confirme
+  o formato de diagrama exigido pelo orientador.
+
+## 9. Ajuda
 
 Para consultar todos os comandos e argumentos disponíveis:
 

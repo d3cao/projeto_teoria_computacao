@@ -1,0 +1,20 @@
+{
+  "config": "../parameters.json",
+  "seeds": [42, 43],
+  "train_sizes": [100, 200],
+  "test_size": 50,
+  "levels": [3, 5],
+  "min_support": 3,
+  "score": {
+    "ccd": {"TRACE": 0, "MODERATE": 0.5, "RICH": 1},
+    "bands": {
+      "phenols": {"thresholds": [50, 150], "scores": [0, 0.5, 1], "inclusive_upper": [150]},
+      "dpph": {"thresholds": [100, 250], "scores": [1, 0.5, 0]},
+      "fps": {"thresholds": [6, 15], "scores": [0, 0.5, 1]},
+      "uv": {"thresholds": [0.4, 0.7], "scores": [0, 0.5, 1]},
+      "dna": {"thresholds": [0.6, 0.8], "scores": [0, 0.5, 1]}
+    },
+    "profiles": {"fps_and_dna": {"fps": 2, "dna": 2}}
+  },
+  "diagram_run": {"seed": 42, "levels": 3, "train_size": 200}
+}
