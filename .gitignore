@@ -1,0 +1,11 @@
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Generated experiment artifacts
+data/moore.json
+data/decisions.csv
