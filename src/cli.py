@@ -7,6 +7,8 @@ from src.data.generation import generate_datasets
 from src.data.io import SAMPLE_COLUMNS, read_samples, write_csv
 from src.automata.discretize import build_alphabet, discretize
 from src.analysis.evaluation import evaluate
+from src.analysis.experiments import run_experiment
+from src.analysis.reports import generate_report
 from src.models import InferenceArtifact
 from src.automata.moore import infer_moore
 
@@ -90,6 +92,20 @@ def _evaluate(args: argparse.Namespace) -> None:
     print(f"Results saved to {args.output}")
 
 
+def _experiment(args: argparse.Namespace) -> None:
+    """Executa a bateria comparativa e informa o diretório de saída."""
+    run_experiment(args.spec, args.output_dir)
+    print(f"Experiment results saved to {args.output_dir}")
+
+
+def _report(args: argparse.Namespace) -> None:
+    """Exporta os materiais e informa dependências de visualização ausentes."""
+    warnings = generate_report(args.experiment_dir, args.output_dir)
+    for warning in warnings:
+        print(f"Warning: {warning}")
+    print(f"Report saved to {args.output_dir}")
+
+
 def _build_parser() -> argparse.ArgumentParser:
     """Configura os comandos e argumentos da interface CLI."""
     parser = argparse.ArgumentParser(
@@ -119,6 +135,18 @@ def _build_parser() -> argparse.ArgumentParser:
     evaluate_parser.add_argument("csv", type=Path)
     evaluate_parser.add_argument("--output", type=Path, default=Path("data/decisions.csv"))
     evaluate_parser.set_defaults(handler=_evaluate)
+
+    experiment_parser = commands.add_parser(
+        "experiment", help="Run a paired comparison over multiple seeds"
+    )
+    experiment_parser.add_argument("--spec", type=Path, required=True)
+    experiment_parser.add_argument("--output-dir", type=Path, required=True)
+    experiment_parser.set_defaults(handler=_experiment)
+
+    report_parser = commands.add_parser("report", help="Export tables and figures from an experiment")
+    report_parser.add_argument("--experiment-dir", type=Path, required=True)
+    report_parser.add_argument("--output-dir", type=Path, required=True)
+    report_parser.set_defaults(handler=_report)
 
     return parser
 
