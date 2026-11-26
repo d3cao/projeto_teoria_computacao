@@ -134,6 +134,8 @@ def run_experiment(spec_path: Path, output_dir: Path) -> None:
     if not isinstance(spec, dict):
         raise ValueError("Experiment specification must be a JSON object")
     seeds = _integers(spec, "seeds")
+    if min(seeds) < 0:
+        raise ValueError("seeds must be non-negative")
     train_sizes = _integers(spec, "train_sizes")
     levels = _integers(spec, "levels")
     test_size = _positive_integer(spec, "test_size")

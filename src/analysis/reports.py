@@ -14,6 +14,7 @@ CONFIG_COLUMNS = ("policy_id", "levels", "train_size")
 COMPARISON_METRICS = (
     "viable", "nonviable", "false_discards", "correct_discards",
     "discards_after_fps", "discards_after_uv", "uv_assays_saved", "dna_assays_saved",
+    "assay_days_saved_min", "assay_days_saved_max",
     "false_discards_after_fps", "false_discards_after_uv",
     "correct_discards_after_fps", "correct_discards_after_uv",
     "false_discard_rate", "false_discard_after_fps_rate", "false_discard_after_uv_rate",

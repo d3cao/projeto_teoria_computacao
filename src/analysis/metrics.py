@@ -26,6 +26,7 @@ def summarize_decisions(results: Iterable[EvaluationResult]) -> Metrics:
     discards_after_uv = false_uv + correct_uv
     uv_saved = discards_after_fps
     dna_saved = discards_after_fps + discards_after_uv
+    assays_saved = uv_saved + dna_saved
 
     return {
         "samples": samples,
@@ -47,10 +48,12 @@ def summarize_decisions(results: Iterable[EvaluationResult]) -> Metrics:
         "discard_efficiency_after_uv_rate": _rate(correct_uv, nonviable),
         "uv_assays_saved": uv_saved,
         "dna_assays_saved": dna_saved,
-        "assays_saved": uv_saved + dna_saved,
+        "assays_saved": assays_saved,
+        "assay_days_saved_min": assays_saved,
+        "assay_days_saved_max": 2 * assays_saved,
         "uv_assays_saved_rate": _rate(uv_saved, samples),
         "dna_assays_saved_rate": _rate(dna_saved, samples),
-        "assays_saved_rate": _rate(uv_saved + dna_saved, 2 * samples),
+        "assays_saved_rate": _rate(assays_saved, 2 * samples),
     }
 
 
