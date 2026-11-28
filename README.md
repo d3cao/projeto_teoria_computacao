@@ -19,6 +19,17 @@ cd projeto_teoria_computacao
 
 Os parâmetros experimentais estão disponíveis no arquivo `parameters.json`. Nele podem ser alteradas as categorias, os limites de discretização, os parâmetros estatísticos da geração sintética e o critério de viabilidade molecular.
 
+### Como alterar os parâmetros da máquina
+
+Para experimentar novos valores, edite `parameters.json` em um editor de texto.
+
+| Campo | O que controla |
+|---|---|
+| `ccd` e `simulation.ccd_thresholds` | Nomes das três categorias de CCD e os dois cortes usados para gerá-las, na mesma ordem. |
+| `thresholds` | Cortes usados pela Moore para discretizar as leituras. Use dois para fenóis e UV e quatro para DPPH e FPS, em ordem crescente e sem repetição. A opção `--levels 3` agrupa as cinco faixas de DPPH e FPS. |
+| `dna_threshold` | Valor mínimo de preservação do DNA para rotular a amostra como viável. Use um valor entre 0 e 1. O DNA é o gabarito da avaliação. |
+| `simulation` | Parâmetros das leituras sintéticas. As listas de três valores representam nível de base, coeficiente do potencial latente e desvio-padrão do ruído. `log_dpph` e `log_fps` usam escala logarítmica natural. Os demais campos controlam o efeito da UV no DNA e a probabilidade e magnitude das perdas simuladas. |
+
 ## 2. Geração dos dados sintéticos
 
 ```bash
